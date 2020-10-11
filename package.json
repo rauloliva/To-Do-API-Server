@@ -1,0 +1,35 @@
+{
+  "name": "todoapp",
+  "version": "1.0.0",
+  "description": "a todo app develop using MEAN stack",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rauloliva/ToDoApp.git"
+  },
+  "keywords": [
+    "To-Do",
+    "Node",
+    "React",
+    "MEAN"
+  ],
+  "author": "Raul Oliva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rauloliva/ToDoApp/issues"
+  },
+  "homepage": "https://github.com/rauloliva/ToDoApp#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "mongoose": "^5.10.9",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^6.0.1"
+  }
+}
