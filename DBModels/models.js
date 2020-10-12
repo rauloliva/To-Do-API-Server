@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     username: String,
     password: String,
     email: String,
-    photo: String,
+    photo: Array,
     googleId: String,
     facebookId: String,
     linkedinId: String

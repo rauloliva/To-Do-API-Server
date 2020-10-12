@@ -1,10 +1,14 @@
 require('dotenv').config()
+
 const bodyParser = require('body-parser')
 const express = require('express')
-const [User, List, Item] = require('./DBModels/models')
-const app = express()
+const multer = require('multer')
 const session = require('express-session')
 const passport = require('passport')
+const upload = multer({dest: 'photos/'})
+const [User, List, Item] = require('./DBModels/models')
+const Lists = require('./routes/Lists')
+const app = express()
 const port = process.env.PORT || 3000
 
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -28,31 +32,47 @@ passport.deserializeUser((id, done) => {
 
 app.listen(port, () => console.log(`The Server started at port ${port}`))
 
-app.post('/login', (req, res) => {
-    const username = req.body.username
-    const password = req.body.password
-    const email = req.body.email
-    const photo = req.photo
-    res.json({
-        usernam: username,
-        password: password,
-        email: email
+app.use('/lists', Lists)
+
+app.post('/register', upload.single('photo'), (req, res) => {
+    const newUser = new User({
+        username: req.body.username,
+        password: req.body.password,
+        email: req.body.email,
+        photo: [] //req.file.filename, req.file.originalname
+    })
+    const response = { res: null, status: 0 }
+    
+    User.register(newUser, newUser.password, (err, user) => {
+        if(err) {
+            res.json({error: err, status: 0, message: 'The user could not be created'})
+        } else {
+            passport.authenticate('local')(req, res, () => res.json({status: 200, message: 'User created', user: user}))
+        }
     })
 })
 
-app.route('/lists')
-    .get((req, res) => {
-        const response = { res: null, status: 0 }
-        List.find({}, (err, lists) => {
-            if(err) {
-                response.status = 500
-            } else {
-                response.res = lists
-                response.status = 200
-            }
-            res.json(response)
-        })
+app.post('/login', (req, res) => {
+    const user = new User({
+        username: req.body.username,
+        password: req.body.password
     })
+    // res.json({
+    //     usernam: username,
+    //     password: password,
+    //     email: email
+    // })
+
+    req.logIn(user, err => {
+        if(err) {
+            res.json({error: err})
+        } else {
+            passport.authenticate("local")(req, res, () => {
+                res.json('User logged In')
+            })
+        }
+    })
+})
 
 app.get('/create', (req, res) => {
     const user = new User({
