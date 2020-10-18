@@ -11,6 +11,7 @@ const Lists = require('./routes/Lists')
 const app = express()
 const port = process.env.PORT || 3000
 
+app.set('view engine', 'ejs')
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -32,7 +33,16 @@ passport.deserializeUser((id, done) => {
 
 app.listen(port, () => console.log(`The Server started at port ${port}`))
 
+app.use('/', (req, res) => {
+    res.status(200).json({response: 'Welcome to my endpoint'})
+})
+
 app.use('/lists', Lists)
+
+app.get('/help', (req, res) => {
+    res.status(200)
+    res.render('help')
+})
 
 app.post('/register', upload.single('photo'), (req, res) => {
     const newUser = new User({
@@ -45,6 +55,7 @@ app.post('/register', upload.single('photo'), (req, res) => {
     
     User.register(newUser, newUser.password, (err, user) => {
         if(err) {
+            res.status(201)
             res.json({error: err, status: 0, message: 'The user could not be created'})
         } else {
             passport.authenticate('local')(req, res, () => res.json({status: 200, message: 'User created', user: user}))
@@ -101,4 +112,11 @@ app.get('/create', (req, res) => {
     list.save()
 
     res.json({status: 'success'})
+})
+
+
+//Handling 404 status
+app.use((req, res) => {
+    res.status(404)
+       .json({error: 'Endpoint not found'})
 })

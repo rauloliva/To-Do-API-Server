@@ -20,4 +20,21 @@ router.get('/', (req, res) => {
     }
 })
 
+router.post('/', (req, res) => {
+    console.log(req.body.name);
+    console.log(req.user.id);
+    const list = new List({
+        name: req.body.name,
+        user: req.user.id,
+        items: []
+    })
+
+    list.save((error, newList) => {
+        if(error) res.json({error: error})
+
+        res.status(201)
+           .json({list: newList})
+    })
+})
+
 module.exports = router
