@@ -37,8 +37,8 @@ userSchema.plugin(passportLocalMongoose)
 listSchema.plugin(passportLocalMongoose)
 itemSchema.plugin(passportLocalMongoose)
 
-module.exports = [
-    mongoose.model('user', userSchema),
-    mongoose.model('list', listSchema),
-    mongoose.model('item', itemSchema)
-]
+module.exports = {
+    user: mongoose.model('user', userSchema),
+    list: mongoose.model('list', listSchema),
+    item: mongoose.model('item', itemSchema)
+}

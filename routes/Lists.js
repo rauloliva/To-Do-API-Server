@@ -1,5 +1,5 @@
 const express = require('express')
-const List = require('../DBModels/models') [1]
+const List = require('../DBModels/models').list
 const router = express.Router()
 
 router.get('/', (req, res) => {
