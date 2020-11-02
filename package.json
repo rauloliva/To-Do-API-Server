@@ -35,6 +35,8 @@
     "nodemon": "^2.0.6",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "passport-local-mongoose": "^6.0.1"
+    "passport-local-mongoose": "^6.0.1",
+    "qs": "^6.9.4",
+    "request": "^2.88.2"
   }
 }

@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
 
 const listSchema = new mongoose.Schema({
     name: String,
+    description: String,
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'

@@ -73,11 +73,10 @@ app.get('/create', (req, res) => {
     res.json({status: 'success'})
 })
 
+app.use('/', (req, res) => res.redirect('/help'))
 
 //Handling 404 status
 app.use((req, res) => {
     res.status(404)
        .json({error: 'Endpoint not found'})
 })
-
-app.use('/', (req, res) => res.redirect('/help'))
