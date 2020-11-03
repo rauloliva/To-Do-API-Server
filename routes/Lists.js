@@ -21,10 +21,11 @@ router.get('/', (req, res) => {
                 res.json(response)
             })
         } else {
-            res.json(response)
+            response.message = "You must log in so you can use this endpoint"
+            response.code = 2
+            res.status(401).json(response)
         }
     })
-    
 })
 
 router.post('/create', (req, res) => {
@@ -39,11 +40,67 @@ router.post('/create', (req, res) => {
             })
 
             list.save((error, newList) => {
-                if(error) res.json({error: error})
-                response.message = `The list ${newList.name} has been created`
-                response.data = newList
-                response.code = 1
-                res.status(201).json(response)
+                if(error) {
+                    response.message = `Server Error: ${error}`
+                    response.code = 2
+                    res.status(500).json(response)
+                } else {
+                    response.message = `The list '${req.body.name}' has been created`
+                    response.data = newList
+                    response.code = 1
+                    res.status(201).json(response)
+                }
+            })
+        } else {
+            response.message = "You must log in so you can use this endpoint"
+            response.code = 2
+            res.status(401).json(response)
+        }
+    })
+})
+
+router.post('/modify', (req, res) => {
+    fs.readFile('response.json', {encoding: 'utf-8'}, (error, data) => {
+        const response = JSON.parse(data)
+        if(req.isAuthenticated()) {
+            const listId = mongoose.Types.ObjectId(req.body.listId)
+            List.findOne({_id: listId}, async (error, list) => {
+                if(error) {
+                    response.code = 0
+                    response.message = "Error " + error
+                } else {
+                    list.name = req.body.name
+                    list.description = req.body.description
+                    
+                    await list.save()
+                    response.message = `The list ${req.body.name} has been updated`
+                    response.code = 1
+                    response.data = list
+                }
+                res.json(response)
+            })
+        } else {
+            response.message = "You must log in so you can use this endpoint"
+            response.code = 2
+            res.status(401).json(response)
+        }
+    })
+})
+
+router.post('/delete', (req, res) => {
+    fs.readFile('response.json', {encoding: 'utf-8'}, (err, data) => {
+        const response = JSON.parse(data)
+        if(req.isAuthenticated()) {
+            const listId = mongoose.Types.ObjectId(req.body.listId)
+            List.remove({_id: listId}, error => {
+                if(error) {
+                    response.message = `The List could not be deleted: ${error}`
+                    response.code = 2
+                } else {
+                    response.message = "The List was deleted"
+                    response.code = 1
+                }
+                res.json(response)
             })
         } else {
             response.message = "You must log in so you can use this endpoint"
