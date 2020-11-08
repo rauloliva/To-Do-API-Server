@@ -2,17 +2,18 @@ const fs = require('fs')
 const express = require('express')
 const mongoose = require('mongoose')
 const List = require('../DBModels/models').list
+const isAuthenticated = require('./common/Common').isAuthenticated
 const router = express.Router()
 
 router.get('/', (req, res) => {
     fs.readFile('response.json', {encoding: 'utf-8'}, (err, data) => {
         const response = JSON.parse(data)
-        if(req.isAuthenticated()){
+        isAuthenticated(req, res, response, () => {
             const userId = mongoose.Types.ObjectId(req.user.id)
             List.find({user: userId}, (error, lists) => {
                 if(err) {
                     response.code = 0
-                    response.message = "Error " + error
+                    response.message = `Server Error: ${error}`
                 } else {
                     response.data = lists
                     response.code = 1
@@ -20,18 +21,14 @@ router.get('/', (req, res) => {
                 }
                 res.json(response)
             })
-        } else {
-            response.message = "You must log in so you can use this endpoint"
-            response.code = 2
-            res.status(401).json(response)
-        }
+        })
     })
 })
 
 router.post('/create', (req, res) => {
     fs.readFile("response.json",{encoding: 'utf-8'}, (err, data) => {
         const response = JSON.parse(data)
-        if(req.isAuthenticated()) {        
+        isAuthenticated(req, res, response, () => {
             const list = new List({
                 name: req.body.name,
                 description: req.body.description,
@@ -51,18 +48,14 @@ router.post('/create', (req, res) => {
                     res.status(201).json(response)
                 }
             })
-        } else {
-            response.message = "You must log in so you can use this endpoint"
-            response.code = 2
-            res.status(401).json(response)
-        }
+        })
     })
 })
 
 router.post('/modify', (req, res) => {
-    fs.readFile('response.json', {encoding: 'utf-8'}, (error, data) => {
+    fs.readFile('response.json', {encoding: 'utf-8'}, (err, data) => {
         const response = JSON.parse(data)
-        if(req.isAuthenticated()) {
+        isAuthenticated(req. res, response, () => {
             const listId = mongoose.Types.ObjectId(req.body.listId)
             List.findOne({_id: listId}, async (error, list) => {
                 if(error) {
@@ -79,18 +72,14 @@ router.post('/modify', (req, res) => {
                 }
                 res.json(response)
             })
-        } else {
-            response.message = "You must log in so you can use this endpoint"
-            response.code = 2
-            res.status(401).json(response)
-        }
+        })
     })
 })
 
 router.post('/delete', (req, res) => {
     fs.readFile('response.json', {encoding: 'utf-8'}, (err, data) => {
         const response = JSON.parse(data)
-        if(req.isAuthenticated()) {
+        isAuthenticated(req, res, response, () => {
             const listId = mongoose.Types.ObjectId(req.body.listId)
             List.remove({_id: listId}, error => {
                 if(error) {
@@ -102,11 +91,7 @@ router.post('/delete', (req, res) => {
                 }
                 res.json(response)
             })
-        } else {
-            response.message = "You must log in so you can use this endpoint"
-            response.code = 2
-            res.status(401).json(response)
-        }
+        })
     })
 })
 
