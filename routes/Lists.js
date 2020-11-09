@@ -1,14 +1,12 @@
-const fs = require('fs')
 const express = require('express')
 const mongoose = require('mongoose')
 const List = require('../DBModels/models').list
-const isAuthenticated = require('./common/Common').isAuthenticated
+const common = require('./common/Common')
 const router = express.Router()
 
 router.get('/', (req, res) => {
-    fs.readFile('response.json', {encoding: 'utf-8'}, (err, data) => {
-        const response = JSON.parse(data)
-        isAuthenticated(req, res, response, () => {
+    common.readResponseFile( response => {
+        common.isAuthenticated(req, res, response, () => {
             const userId = mongoose.Types.ObjectId(req.user.id)
             List.find({user: userId}, (error, lists) => {
                 if(err) {
@@ -26,9 +24,8 @@ router.get('/', (req, res) => {
 })
 
 router.post('/create', (req, res) => {
-    fs.readFile("response.json",{encoding: 'utf-8'}, (err, data) => {
-        const response = JSON.parse(data)
-        isAuthenticated(req, res, response, () => {
+    common.readResponseFile( response => {
+        common.isAuthenticated(req, res, response, () => {
             const list = new List({
                 name: req.body.name,
                 description: req.body.description,
@@ -53,9 +50,8 @@ router.post('/create', (req, res) => {
 })
 
 router.post('/modify', (req, res) => {
-    fs.readFile('response.json', {encoding: 'utf-8'}, (err, data) => {
-        const response = JSON.parse(data)
-        isAuthenticated(req. res, response, () => {
+    common.readResponseFile( response => {
+        common.isAuthenticated(req. res, response, () => {
             const listId = mongoose.Types.ObjectId(req.body.listId)
             List.findOne({_id: listId}, async (error, list) => {
                 if(error) {
@@ -76,10 +72,9 @@ router.post('/modify', (req, res) => {
     })
 })
 
-router.post('/delete', (req, res) => {
-    fs.readFile('response.json', {encoding: 'utf-8'}, (err, data) => {
-        const response = JSON.parse(data)
-        isAuthenticated(req, res, response, () => {
+router.delete('/delete', (req, res) => {
+    common.readResponseFile( response => {
+        common.isAuthenticated(req, res, response, () => {
             const listId = mongoose.Types.ObjectId(req.body.listId)
             List.remove({_id: listId}, error => {
                 if(error) {

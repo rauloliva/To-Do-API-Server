@@ -1,15 +1,13 @@
-const fs = require('fs')
 const express = require('express')
 const mongoose = require('mongoose')
 const Item = require('../DBModels/models').item
 const List = require('../DBModels/models').list
-const isAuthenticated = require('./common/Common').isAuthenticated
+const common = require('./common/Common')
 const router = express.Router()
 
 router.post('/create', (req, res) => {
-    fs.readFile('response.json', {encoding: 'utf-8'}, (err, data) => {
-        const response = JSON.parse(data)
-        isAuthenticated(req, res, response, () => {
+    common.readResponseFile( response => {
+        common.isAuthenticated(req, res, response, () => {
             const item = new Item({
                 task: req.body.task,
                 isDone: req.body.isDone
@@ -17,13 +15,13 @@ router.post('/create', (req, res) => {
 
             item.save((error, newItem) => {
                 if(error) {
-                    response.message = `Server Error: ${error}`
+                    response.message = `${process.env.MSG_SERVER_ERROR} ${error}`
                     response.code = 2
                     res.status(500).json(response)
                 } else {
                     const listId = mongoose.Types.ObjectId(req.body.listId)
                     updateItemsOnList(listId, newItem._id, () => {
-                        response.message = `The Item '${req.body.task}' has been created`
+                        response.message = process.env.MSG_ITEM_RETRIEVED.replace('#', req.body.task)
                         response.data = newItem
                         response.code = 1
                         res.status(201).json(response)
@@ -35,9 +33,8 @@ router.post('/create', (req, res) => {
 })
 
 router.get('/:itemId', (req, res) => {
-    fs.readFile('response.json',{encoding: 'utf-8'}, (err, data) => {
-        const response = JSON.parse(data)
-        isAuthenticated(req, res, response, () => {
+    common.readResponseFile( response => {
+        common.isAuthenticated(req, res, response, () => {
             const itemId = mongoose.Types.ObjectId(req.params.itemId)
             Item.findOne({_id: itemId}, (err, item) => {
                 response.message = "Item retrieved"
