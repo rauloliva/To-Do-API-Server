@@ -35,12 +35,45 @@ router.post('/create', (req, res) => {
 router.get('/:itemId', (req, res) => {
     common.readResponseFile( response => {
         common.isAuthenticated(req, res, response, () => {
-            const itemId = mongoose.Types.ObjectId(req.params.itemId)
-            Item.findOne({_id: itemId}, (err, item) => {
+            common.findItem(req.params.itemId, res, response, item => {
                 response.message = "Item retrieved"
                 response.data = item
                 response.code = 1
-                res.status(201).json(response)
+                res.status(200).json(response)
+            })
+        })
+    })
+})
+
+router.patch('/:itemId', (req, res) => {
+    common.readResponseFile( response => {
+        common.isAuthenticated(req, res, response, () => {
+            common.findItem(req.params.itemId, res, response, async item => {
+                item[req.body.field] = req.body.value
+                await item.save()
+
+                response.message = "The Item has been updated"
+                response.data = item
+                response.code = 1
+                res.status(200).json(response)
+            })
+        })
+    })
+})
+
+router.delete('/:itemId', (req, res) => {
+    common.readResponseFile( response => {
+        common.isAuthenticated(req, res, response, () => {
+            const itemId = mongoose.Types.ObjectId(req.params.itemId)
+            Item.remove({_id: itemId}, err => {
+                if(error) {
+                    response.message = `The Item could not be deleted: ${error}`
+                    response.code = 2
+                } else {
+                    response.message = "The Item was deleted"
+                    response.code = 1
+                }
+                res.status(204).json(response)
             })
         })
     })

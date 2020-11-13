@@ -1,4 +1,6 @@
 const fs = require('fs')
+const mongoose = require('mongoose')
+const Item = require('../../DBModels/models').item
 
 /**
  * 
@@ -18,6 +20,7 @@ const isAuthenticated = (req, res, response, cb) => {
 }
 
 /**
+ * Reads the response.json file
  * 
  * @param {Function} cb the callback function 
  */
@@ -27,7 +30,28 @@ const readResponseFile = async (cb) => {
     cb(response)
 }
 
+/**
+ * 
+ * @param {*} id 
+ * @param {*} res 
+ * @param {*} response 
+ * @param {*} cb 
+ */
+const findItem = (id, res, response, cb) => {
+    const itemId = mongoose.Types.ObjectId(id)
+    Item.findOne({_id: itemId}, (err, item) => {
+        if(err) {
+            response.message = `${process.env.MSG_SERVER_ERROR} ${err}`
+            response.code = 2
+            res.status(500).json(response)
+        } else {
+            cb(item)
+        }
+    })
+}
+
 module.exports = {
     isAuthenticated: isAuthenticated,
-    readResponseFile: readResponseFile 
+    readResponseFile: readResponseFile,
+    findItem: findItem
 }

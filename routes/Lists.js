@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
             List.find({user: userId}, (error, lists) => {
                 if(err) {
                     response.code = 0
-                    response.message = `Server Error: ${error}`
+                    response.message = `${process.env.MSG_SERVER_ERROR} ${error}`
                 } else {
                     response.data = lists
                     response.code = 1
@@ -35,7 +35,7 @@ router.post('/create', (req, res) => {
 
             list.save((error, newList) => {
                 if(error) {
-                    response.message = `Server Error: ${error}`
+                    response.message = `${process.env.MSG_SERVER_ERROR} ${error}`
                     response.code = 2
                     res.status(500).json(response)
                 } else {
@@ -49,14 +49,14 @@ router.post('/create', (req, res) => {
     })
 })
 
-router.post('/modify', (req, res) => {
+router.put('/:listId', (req, res) => {
     common.readResponseFile( response => {
         common.isAuthenticated(req. res, response, () => {
-            const listId = mongoose.Types.ObjectId(req.body.listId)
+            const listId = mongoose.Types.ObjectId(req.params.listId)
             List.findOne({_id: listId}, async (error, list) => {
                 if(error) {
                     response.code = 0
-                    response.message = "Error " + error
+                    response.message = `${process.env.MSG_SERVER_ERROR} ${error}`
                 } else {
                     list.name = req.body.name
                     list.description = req.body.description
@@ -72,10 +72,10 @@ router.post('/modify', (req, res) => {
     })
 })
 
-router.delete('/delete', (req, res) => {
+router.delete('/:listId', (req, res) => {
     common.readResponseFile( response => {
         common.isAuthenticated(req, res, response, () => {
-            const listId = mongoose.Types.ObjectId(req.body.listId)
+            const listId = mongoose.Types.ObjectId(req.params.listId)
             List.remove({_id: listId}, error => {
                 if(error) {
                     response.message = `The List could not be deleted: ${error}`

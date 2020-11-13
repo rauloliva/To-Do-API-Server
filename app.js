@@ -9,7 +9,7 @@ const Lists = require('./routes/Lists')
 const Items = require('./routes/Items')
 const Auth = require('./routes/Auth')
 const app = express()
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 2000
 
 app.set('view engine', 'ejs')
 app.use(bodyParser.urlencoded({ extended: true }))

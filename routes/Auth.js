@@ -46,15 +46,15 @@ router.post('/login', (req, res) => {
     
         req.logIn(user, err => {
             if(err) {
-                response.message = "Error: " + err
+                response.message = `${process.env.MSG_SERVER_ERROR} ${err}`
                 response.code = 0
                 response.error = err
-                res.json(response)
+                res.status(200).json(response)
             } else {
                 passport.authenticate("local")(req, res, () => {
-                    response.message = "The User is Logged In"
+                    response.message = process.env.MSG_USER_LOGGED
                     response.code = 1
-                    res.status(201).json(response)
+                    res.status(200).json(response)
                 })
             }
         })
