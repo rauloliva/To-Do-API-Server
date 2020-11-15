@@ -61,4 +61,40 @@ router.post('/login', (req, res) => {
     })
 })
 
+// Facebook Strategy
+router.get('/facebook', passport.authenticate('facebook', { scope : ['email'] }))
+router.get('/facebook/callback', 
+    passport.authenticate(("facebook"),
+        {failureRedirect: '/failure'}),
+        (req, res) => {
+            res.redirect('/auth/profile')
+            console.log('SUCEES');      
+        }
+    )
+
+// Github Strategy
+router.get('/github', passport.authenticate('github', { scope: [ 'user:email' ] }))
+router.get('/github/callback', 
+    passport.authenticate(("github"),
+        {failureRedirect: '/auth/failure'}),
+        (req, res) => {
+            res.redirect('/auth/profile')
+            console.log('SUCCESS');      
+        }
+    )
+
+router.get('/profile', (req, res) => {
+    if(req.isAuthenticated()) {
+        res.render("redirect")
+    }else {
+        res.send('You need to authenticate')
+    }
+    
+})
+
+router.get('/failure', (req, res) => {
+    res.json({failure: 'Something happend'})
+})
+
+
 module.exports = router

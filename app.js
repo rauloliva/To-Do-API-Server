@@ -8,6 +8,8 @@ const User = require('./DBModels/models').user
 const Lists = require('./routes/Lists')
 const Items = require('./routes/Items')
 const Auth = require('./routes/Auth')
+const FacebookStrategy = require('passport-facebook').Strategy
+const GithubStrategy = require('passport-github2').Strategy
 const app = express()
 const port = process.env.PORT || 2000
 
@@ -30,6 +32,48 @@ passport.deserializeUser((id, done) => {
         done(err, user)
     })
 })
+
+passport.use(new FacebookStrategy({
+        clientID: process.env.FACEBOOK_CLIENT_ID,
+        clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+        callbackURL: 'http://localhost:2000/auth/facebook/callback',
+        profileFields: ['id','displayName', 'photos', 'emails'],
+        // passReqToCallback: true,
+    },
+    (accessToken, refreshToken, profile, cb) => {
+        const photo = `https://graph.facebook.com/${profile.id}/picture?width=200&height=200&access_token=${accessToken}`
+        let user = {
+            facebookId: profile.id, 
+            username: profile.displayName,
+            photo: photo,
+            email: profile._json.email
+        }
+        User.findOrCreate(user, (err, user) => {
+            return cb(err, user)    
+        })
+    }
+))
+
+passport.use(new GithubStrategy({
+        clientID: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        callbackURL: 'http://localhost:2000/auth/github/callback'
+        // profileFields: ['id','displayName', 'photos', 'emails'],
+    },
+    (accessToken, refreshToken, profile, cb) => {
+        console.log("Github Profile");
+        console.log(profile);
+        let user = {
+            githubId: profile.id, 
+            username: profile.displayName,
+            photo: profile.photos[0].value,
+            email: profile.emails[0].value
+        }
+        User.findOrCreate(user, (err, user) => {
+            return cb(err, user)    
+        })
+    }
+))
 
 app.listen(port, () => console.log(`The Server started at port ${port}`))
 

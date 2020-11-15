@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('header', {title: 'Redirecting'}); %>
+<body>
+    <div class="card">
+        <h2 class="card-header">Redirecting...</h2>
+        <div class="card-body">
+          <h5 class="card-title">Authentication was succesful</h5>
+          <p class="card-text">
+              Please wait your request is being processed, redirecting in 
+              <span id="count" style="color: red; font-size: 1.2em">5</span> 
+          </p>
+        </div>
+    </div>
+</body>
+<script>
+    var count = 5
+    setInterval(() => {
+        document.querySelector('#count').textContent = count--
+    }, 1000);
+
+    setTimeout(() => {
+        window.location = "http://localhost:3000/"
+    }, 6000) 
+</script>
+</html>

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const passportLocalMongoose = require('passport-local-mongoose')
+const findOrCreate = require('mongoose-findorcreate')
 
 mongoose.connect('mongodb://localhost:27017/ToDoApp', {
     useNewUrlParser: true,
@@ -14,7 +15,8 @@ const userSchema = new mongoose.Schema({
     photo: Array,
     googleId: String,
     facebookId: String,
-    linkedinId: String
+    linkedinId: String,
+    githubId: String
 }, { timestamps: true })
 
 const listSchema = new mongoose.Schema({
@@ -37,6 +39,10 @@ const itemSchema = new mongoose.Schema({
 userSchema.plugin(passportLocalMongoose)
 listSchema.plugin(passportLocalMongoose)
 itemSchema.plugin(passportLocalMongoose)
+
+userSchema.plugin(findOrCreate)
+listSchema.plugin(findOrCreate)
+itemSchema.plugin(findOrCreate)
 
 module.exports = {
     user: mongoose.model('user', userSchema),
