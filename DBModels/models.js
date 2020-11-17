@@ -12,11 +12,12 @@ const userSchema = new mongoose.Schema({
     username: String,
     password: String,
     email: String,
-    photo: Array,
+    photo: String,
     googleId: String,
     facebookId: String,
     linkedinId: String,
-    githubId: String
+    githubId: String,
+    twitterId: String
 }, { timestamps: true })
 
 const listSchema = new mongoose.Schema({

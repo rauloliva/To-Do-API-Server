@@ -83,6 +83,17 @@ router.get('/github/callback',
         }
     )
 
+// Twitter Strategy
+router.get('/twitter', passport.authenticate('twitter'))
+router.get('/twitter/callback', 
+    passport.authenticate(("twitter"),
+        {failureRedirect: '/auth/failure'}),
+        (req, res) => {
+            res.redirect('/auth/profile')
+            console.log('SUCCESS');      
+        }
+    )
+
 router.get('/profile', (req, res) => {
     if(req.isAuthenticated()) {
         res.render("redirect")
