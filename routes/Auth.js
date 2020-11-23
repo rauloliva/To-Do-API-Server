@@ -66,10 +66,7 @@ router.get('/facebook', passport.authenticate('facebook', { scope : ['email'] })
 router.get('/facebook/callback', 
     passport.authenticate(("facebook"),
         {failureRedirect: '/failure'}),
-        (req, res) => {
-            res.redirect('/auth/profile')
-            console.log('SUCEES');      
-        }
+        (req, res) => redirectOnSuccess(req, res)
     )
 
 // Github Strategy
@@ -77,10 +74,7 @@ router.get('/github', passport.authenticate('github', { scope: [ 'user:email' ] 
 router.get('/github/callback', 
     passport.authenticate(("github"),
         {failureRedirect: '/auth/failure'}),
-        (req, res) => {
-            res.redirect('/auth/profile')
-            console.log('SUCCESS');      
-        }
+        (req, res) => redirectOnSuccess(req, res)
     )
 
 // Twitter Strategy
@@ -88,19 +82,33 @@ router.get('/twitter', passport.authenticate('twitter'))
 router.get('/twitter/callback', 
     passport.authenticate(("twitter"),
         {failureRedirect: '/auth/failure'}),
-        (req, res) => {
-            res.redirect('/auth/profile')
-            console.log('SUCCESS');      
-        }
+        (req, res) => redirectOnSuccess(req, res)
     )
 
-router.get('/profile', (req, res) => {
+// Google Strategy
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
+router.get('/google/callback', 
+    passport.authenticate(("google"),
+        {failureRedirect: '/auth/failure'}),
+        (req, res) => redirectOnSuccess(req, res)
+    )
+
+// Twitch Strategy
+router.get('/twitch', passport.authenticate('twitchtv'))
+router.get('/twitch/callback', 
+    passport.authenticate(("twitch"),
+        {failureRedirect: '/auth/failure'}),
+        (req, res) => redirectOnSuccess(req, res)
+    )
+
+const redirectOnSuccess = (req, res) => res.redirect('/auth/redirect')
+
+router.get('/redirect', (req, res) => {
     if(req.isAuthenticated()) {
         res.render("redirect")
     }else {
         res.send('You need to authenticate')
     }
-    
 })
 
 router.get('/failure', (req, res) => {

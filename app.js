@@ -9,9 +9,9 @@ const Lists = require('./routes/Lists')
 const Items = require('./routes/Items')
 const Auth = require('./routes/Auth')
 const Strategies = require('./Strategies/Strategies')
-const { request } = require('express')
 const app = express()
 const port = process.env.PORT || 2000
+process.env.NODE_ENV_URL = process.env.NODE_ENV === 'dev' ? `http://localhost:${port}` : ''
 
 app.set('view engine', 'ejs')
 app.use(bodyParser.urlencoded({ extended: true }))

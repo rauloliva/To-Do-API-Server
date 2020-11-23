@@ -17,7 +17,8 @@ const userSchema = new mongoose.Schema({
     facebookId: String,
     linkedinId: String,
     githubId: String,
-    twitterId: String
+    twitterId: String,
+    twitchId: String
 }, { timestamps: true })
 
 const listSchema = new mongoose.Schema({
