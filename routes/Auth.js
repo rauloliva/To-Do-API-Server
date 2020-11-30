@@ -4,14 +4,17 @@ const multer = require('multer')
 const upload = multer({dest: 'photos/'})
 const passport = require('passport')
 const readResponseFile = require('./common/Common').readResponseFile
+const isAuthenticated = require('./common/Common').isAuthenticated
+const objectId = require('./common/Common').objectId
 const router = express.Router()
 
-router.post('/register', upload.single('photo'), (req, res) => {
+router.post('/register', /*uploabcryptd.single('photo'),*/ (req, res) => {
     readResponseFile( response => {
         const newUser = new User({
             username: req.body.username,
             email: req.body.email,
-            photo: [] //req.file.filename, req.file.originalname
+            token: req.sessionID
+            //photo: [] //req.file.filename, req.file.originalname
         })
 
         User.register(newUser, req.body.password, (err, user) => {
@@ -24,7 +27,7 @@ router.post('/register', upload.single('photo'), (req, res) => {
                 passport.authenticate('local')(req, res, () => {
                     response.message = "User Created"
                     response.code = 1
-                    response.data = user
+                    response.data = user.token
                     res.status(201).json(response)
                 })
             }
@@ -33,17 +36,9 @@ router.post('/register', upload.single('photo'), (req, res) => {
 })
 
 router.post('/login', (req, res) => {
-    readResponseFile( response => {
-        const user = new User({
-            username: req.body.username,
-            password: req.body.password
-        })
-        // res.json({
-        //     usernam: username,
-        //     password: password,
-        //     email: email
-        // })
-    
+    readResponseFile( async response => {
+        const user = await User.findOne({username: req.body.username}).exec()
+
         req.logIn(user, err => {
             if(err) {
                 response.message = `${process.env.MSG_SERVER_ERROR} ${err}`
@@ -51,12 +46,27 @@ router.post('/login', (req, res) => {
                 response.error = err
                 res.status(200).json(response)
             } else {
-                passport.authenticate("local")(req, res, () => {
-                    response.message = process.env.MSG_USER_LOGGED
-                    response.code = 1
-                    res.status(200).json(response)
+                passport.authenticate("local")(req, res, async () => {
+                    User.updateOne({_id: objectId(user._id)}, {token: req.sessionID}, (err, u) => {
+                        response.message = process.env.MSG_USER_LOGGED
+                        response.code = 1
+                        response.data = req.sessionID   
+                        res.status(200).json(response)
+                    })
                 })
             }
+        })
+    })
+})
+
+router.get('/user/:token', (req, res) => {
+    readResponseFile( response => {
+        const token = req.params.token
+        User.findOne({token: token}, (err, user) => {
+            response.code = 1
+            response.message = 'Returning User Authenticated'
+            response.data = user
+            res.status(200).json(response)
         })
     })
 })
@@ -105,7 +115,17 @@ const redirectOnSuccess = (req, res) => res.redirect('/auth/redirect')
 
 router.get('/redirect', (req, res) => {
     if(req.isAuthenticated()) {
-        res.render("redirect")
+        const token = req.user.token
+        res.render("redirect", { token: token })
+    }else {
+        res.send('You need to authenticate')
+    }
+})
+
+router.get('/redirect/:token', (req, res) => {
+    if(req.params.token) {
+        const token = req.params.token
+        res.render("redirect", { token: token })
     }else {
         res.send('You need to authenticate')
     }

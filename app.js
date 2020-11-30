@@ -22,6 +22,11 @@ app.use(session({
 }))
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(session({
+    secret: 'secretsession',
+    resave: false,
+    saveUninitialized: false,
+}))
 passport.use(User.createStrategy())
 passport.serializeUser((user, done) => {
     done(null, user.id)

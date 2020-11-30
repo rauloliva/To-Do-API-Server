@@ -1,6 +1,8 @@
 const fs = require('fs')
 const mongoose = require('mongoose')
 const Item = require('../../DBModels/models').item
+const bcrypt = require('bcrypt')
+const User = require('../../DBModels/models').user
 
 /**
  * 
@@ -50,8 +52,12 @@ const findItem = (id, res, response, cb) => {
     })
 }
 
+const objectId = id => mongoose.Types.ObjectId(id)
+
 module.exports = {
     isAuthenticated: isAuthenticated,
     readResponseFile: readResponseFile,
-    findItem: findItem
+    findItem: findItem,
+    generateToken: generateToken,
+    objectId: objectId
 }

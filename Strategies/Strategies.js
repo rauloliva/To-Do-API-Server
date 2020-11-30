@@ -20,7 +20,8 @@ const Strategies = () => {
                 facebookId: profile.id, 
                 username: profile.displayName,
                 photo: photo,
-                email: profile._json.email
+                email: profile._json.email,
+                token: accessToken
             }
             User.findOrCreate(user, (err, user) => {
                 return cb(err, user)    
@@ -38,7 +39,8 @@ const Strategies = () => {
                 githubId: profile.id, 
                 username: profile.displayName,
                 photo: profile.photos[0].value,
-                email: profile.emails[0].value
+                email: profile.emails[0].value,
+                token: accessToken
             }
             User.findOrCreate(user, (err, user) => {
                 return cb(err, user)    
@@ -57,7 +59,8 @@ const Strategies = () => {
                 twitterId: profile.id, 
                 username: profile.username,
                 photo: profile.photos[0].value,
-                email: profile.emails[0].value
+                email: profile.emails[0].value,
+                token: accessToken
             }
             User.findOrCreate(user, (err, user) => {
                 return cb(err, user)    
@@ -75,7 +78,8 @@ const Strategies = () => {
                 googleId: profile.id, 
                 username: profile.displayName,
                 photo: profile.photos[0].value,
-                email: profile._json.email
+                email: profile._json.email,
+                token: accessToken
             }
             User.findOrCreate(user, (err, user) => {
                 return cb(err, user)    
@@ -93,7 +97,8 @@ const Strategies = () => {
                 twitchId: profile.id, 
                 username: profile.username,
                 photo: profile.photos[0].value,
-                email: profile.emails[0].value
+                email: profile.emails[0].value,
+                token: accessToken
             }
             User.findOrCreate(user, (err, user) => {
                 return cb(err, user)    

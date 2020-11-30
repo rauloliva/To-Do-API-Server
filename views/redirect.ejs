@@ -10,6 +10,7 @@
               Please wait your request is being processed, redirecting in 
               <span id="count" style="color: red; font-size: 1.2em">5</span> 
           </p>
+          <input type="hidden" id="token" value="<%= token %>" />
         </div>
     </div>
 </body>
@@ -20,7 +21,8 @@
     }, 1000);
 
     setTimeout(() => {
-        window.location = "http://localhost:3000/dashboard"
+        const token = document.querySelector('#token').value
+        window.location = "http://localhost:3000/dashboard/" + token
     }, 6000) 
 </script>
 </html>
