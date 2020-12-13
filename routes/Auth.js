@@ -1,10 +1,8 @@
 const express = require('express')
-const User = require('../DBModels/models').user
-const multer = require('multer')
-const upload = multer({dest: 'photos/'})
+const User = require('../models').user
 const passport = require('passport')
 const readResponseFile = require('./common/Common').readResponseFile
-const isAuthenticated = require('./common/Common').isAuthenticated
+const { getPhoto } = require('./Utilities')
 const objectId = require('./common/Common').objectId
 const router = express.Router()
 
@@ -13,7 +11,8 @@ router.post('/register', /*uploabcryptd.single('photo'),*/ (req, res) => {
         const newUser = new User({
             username: req.body.username,
             email: req.body.email,
-            token: req.sessionID
+            token: req.sessionID,
+            password: req.body.password
             //photo: [] //req.file.filename, req.file.originalname
         })
 
@@ -63,10 +62,12 @@ router.get('/user/:token', (req, res) => {
     readResponseFile( response => {
         const token = req.params.token
         User.findOne({token: token}, (err, user) => {
-            response.code = 1
-            response.message = 'Returning User Authenticated'
-            response.data = user
-            res.status(200).json(response)
+            getPhoto(user, u => {
+                response.code = 1
+                response.message = 'Returning User Authenticated'
+                response.data = u
+                res.status(200).json(response)
+            })
         })
     })
 })
@@ -116,7 +117,7 @@ const redirectOnSuccess = (req, res) => res.redirect('/auth/redirect')
 router.get('/redirect', (req, res) => {
     if(req.isAuthenticated()) {
         const token = req.user.token
-        res.render("redirect", { token: token })
+        res.render("redirect", { token: token, uri: '/dashboard' })
     }else {
         res.send('You need to authenticate')
     }
@@ -125,7 +126,7 @@ router.get('/redirect', (req, res) => {
 router.get('/redirect/:token', (req, res) => {
     if(req.params.token) {
         const token = req.params.token
-        res.render("redirect", { token: token })
+        res.render("redirect", { token: token, uri: '/dashboard' })
     }else {
         res.send('You need to authenticate')
     }

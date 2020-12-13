@@ -11,10 +11,12 @@
               <span id="count" style="color: red; font-size: 1.2em">5</span> 
           </p>
           <input type="hidden" id="token" value="<%= token %>" />
+          <input type="hidden" id="uri" value="<%= uri %>" />
         </div>
     </div>
 </body>
 <script>
+    const client = 'http://localhost:3000'
     var count = 5
     setInterval(() => {
         document.querySelector('#count').textContent = count--
@@ -22,7 +24,8 @@
 
     setTimeout(() => {
         const token = document.querySelector('#token').value
-        window.location = "http://localhost:3000/dashboard/" + token
+        const uri = document.querySelector('#uri').value
+        window.location = `${client}${uri}/${token}`
     }, 6000) 
-</script>
+</script> 
 </html>

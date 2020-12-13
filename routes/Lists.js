@@ -1,6 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const List = require('../DBModels/models').list
+const List = require('../models').list
 const common = require('./common/Common')
 const router = express.Router()
 
