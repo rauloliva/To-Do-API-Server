@@ -21,9 +21,10 @@ const Strategies = () => {
         let user = {
           facebookId: profile.id,
           username: profile.displayName,
-          photo: photo,
+          photo: { filename: photo },
           email: profile._json.email,
           token: accessToken,
+          authLocally: false
         };
         User.findOrCreate(user, (err, user) => {
           return cb(err, user);
@@ -43,9 +44,10 @@ const Strategies = () => {
         let user = {
           githubId: profile.id,
           username: profile.displayName,
-          photo: profile.photos[0].value,
+          photo: { filename: profile.photos[0].value },
           email: profile.emails[0].value,
           token: accessToken,
+          authLocally: false
         };
         User.findOrCreate(user, (err, user) => {
           return cb(err, user);
@@ -67,9 +69,10 @@ const Strategies = () => {
         let user = {
           twitterId: profile.id,
           username: profile.username,
-          photo: profile.photos[0].value,
+          photo: { filename: profile.photos[0].value },
           email: profile.emails[0].value,
           token: accessToken,
+          authLocally: false
         };
         User.findOrCreate(user, (err, user) => {
           return cb(err, user);
@@ -92,6 +95,7 @@ const Strategies = () => {
           photo: { filename: profile.photos[0].value },
           email: profile._json.email,
           token: accessToken,
+          authLocally: false
         };
         User.findOrCreate(user, (err, user) => {
           return cb(err, user);
@@ -114,6 +118,7 @@ const Strategies = () => {
           photo: profile.photos[0].value,
           email: profile.emails[0].value,
           token: accessToken,
+          authLocally: false
         };
         User.findOrCreate(user, (err, user) => {
           return cb(err, user);

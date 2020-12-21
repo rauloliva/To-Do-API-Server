@@ -41,6 +41,7 @@ passport.deserializeUser((id, done) => {
     })
 })
 
+// Defining the strategies
 Strategies()
 
 app.listen(port, () => console.log(`The Server started at port ${port}`))
@@ -58,22 +59,12 @@ app.get('/logout/:token', (req, res) => {
     readResponseFile( response => {
         User.updateOne({token: token}, {token: ''}, (...args) => {
             response.code = 1
-            response.message = 'Token removed'
+            response.message = 'User logged out'
             res.status(200).json(response)
         })
     })
-    
 })
 
-app.get('/help', (req, res) => {
-    res.status(200)
-    res.render('help')
-})
+app.get('/help', (req, res) => res.status(200).render('help'))
 
 app.use('/', (req, res) => res.redirect('/help'))
-
-//Handling 404 status
-app.use((req, res) => {
-    res.status(404)
-       .json({error: 'Endpoint not found'})
-})

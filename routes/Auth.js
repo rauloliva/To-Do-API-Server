@@ -5,14 +5,16 @@ const readResponseFile = require('./common/Common').readResponseFile
 const { getPhoto } = require('./Utilities')
 const objectId = require('./common/Common').objectId
 const router = express.Router()
+const log = require('../logs/Log')
 
-router.post('/register', /*uploabcryptd.single('photo'),*/ (req, res) => {
+router.post('/register', (req, res) => {
     readResponseFile( response => {
         const newUser = new User({
             username: req.body.username,
             email: req.body.email,
             token: req.sessionID,
-            password: req.body.password
+            password: req.body.password,
+            authLocally: true
             //photo: [] //req.file.filename, req.file.originalname
         })
 
@@ -119,6 +121,7 @@ router.get('/redirect', (req, res) => {
         const token = req.user.token
         res.render("redirect", { token: token, uri: '/dashboard' })
     }else {
+        log('You need to authenticate')
         res.send('You need to authenticate')
     }
 })
