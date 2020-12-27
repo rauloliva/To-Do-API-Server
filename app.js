@@ -11,6 +11,7 @@ const Auth = require('./routes/Auth')
 const UserRouter = require('./routes/User')
 const Strategies = require('./Strategies/Strategies')
 const readResponseFile = require('./routes/common/Common').readResponseFile
+const Local = require('passport-local').Strategy
 const app = express()
 const port = process.env.PORT || 2000
 process.env.NODE_ENV_URL = process.env.NODE_ENV === 'dev' ? `http://localhost:${port}` : ''
@@ -30,7 +31,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
 }))
-passport.use(User.createStrategy())
+// passport.use(User.createStrategy())
 passport.serializeUser((user, done) => {
     done(null, user.id)
 })

@@ -1,7 +1,10 @@
 const express = require('express')
+const common = require('./common/Common')
 const User = require('../models').user
 const fs = require('fs')
 const multer = require('multer')
+const { generateHash } = require('./Utilities')
+const { passwordChanged } = require('./Utilities')
 var storage = multer.diskStorage({
     destination: 'photos/',
     filename: (req, file, cb) => {
@@ -23,7 +26,38 @@ router.post('/photo/:token', upload.single('file'), (req, res) => {
                 photo: `data:${photoObj.mimetype};base64,${data.toString('base64')}`
             })
         })
-   })
+    })
+})
+
+router.post('/update/:token', (req, res) => {
+    const token = req.params.token
+    const updatedData = {
+        username: req.body.username,
+        email: req.body.email
+    }
+
+    console.log(updatedData);
+
+    common.readResponseFile( response => {
+        User.updateOne({token: token}, updatedData, (...args) => {
+            response.code = 1
+            response.message = 'User updated succesfully'
+            res.status(200).json(response)
+        })
+    })
+})
+
+router.post('/update/password/:token',(req, res) => {
+    const token = req.params.token
+    generateHash(req.body.password, (hash) => {
+        common.readResponseFile( response => {
+            User.updateOne({token: token}, {password: hash}, (...args) => {
+                response.code = 1
+                response.message = 'Password updated succesfully'
+                res.status(200).json(response)
+            })
+        })
+    })
 })
 
 module.exports = router

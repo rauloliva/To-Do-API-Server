@@ -5,9 +5,32 @@ const GithubStrategy = require('passport-github2').Strategy;
 const TwitterStrategy = require('passport-twitter').Strategy;
 const TwitchStrategy = require('passport-twitchtv').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const LocalStrategy = require('passport-local').Strategy
+const { validatePassword } = require('../routes/Utilities')
 const env = process.env;
 
 const Strategies = () => {
+  passport.use(
+    new LocalStrategy(
+      {
+        usernameField: 'username'
+      },
+      (username, password, done) => {
+        User.findOne({username: username}, (err, user) => {
+          if(user) {
+            validatePassword(password, user.password, (er, same) => {
+                if(same) {
+                  return done(null, user)
+                } else {
+                  return done(null, false, {message: 'Wrong password buddy'})
+                }
+            })
+          }
+        })
+      }
+    )
+  )
+
   passport.use(
     new FacebookStrategy(
       {

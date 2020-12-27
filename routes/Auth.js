@@ -2,68 +2,71 @@ const express = require('express')
 const User = require('../models').user
 const passport = require('passport')
 const readResponseFile = require('./common/Common').readResponseFile
+const readResponse = require('./common/Common').readResponse
 const { getPhoto } = require('./Utilities')
 const objectId = require('./common/Common').objectId
 const router = express.Router()
 const log = require('../logs/Log')
+const { generateHash } = require('./Utilities')
 
 router.post('/register', (req, res) => {
-    readResponseFile( response => {
-        const newUser = new User({
-            username: req.body.username,
-            email: req.body.email,
-            token: req.sessionID,
-            password: req.body.password,
-            authLocally: true
-            //photo: [] //req.file.filename, req.file.originalname
-        })
+    if(readResponse.code === 0) {
+        generateHash(req.body.password, (hash) => {
+            const user = new User({
+                username: req.body.username,
+                email: req.body.email,
+                token: req.sessionID,
+                password: hash,
+                authLocally: true
+            })
 
-        User.register(newUser, req.body.password, (err, user) => {
-            if(err) {
-                response.message = "The user could not be created"
-                response.code = 0
-                response.error = err
-                res.json(response)
-            } else {
-                passport.authenticate('local')(req, res, () => {
-                    response.message = "User Created"
-                    response.code = 1
-                    response.data = user.token
-                    res.status(201).json(response)
-                })
-            }
-        })
-    })
+            User.findOne({username: req.body.username}, (err, userFound) => {
+                if(userFound) {
+                    readResponse.message = "The username already exists"
+                    readResponse.code = -1 
+                    res.json(readResponse)
+                } else {
+                    user.save((err, d) => {
+                        readResponse.message = "User Created"
+                        readResponse.code = 1
+                        readResponse.data = user.token
+                        res.json(readResponse)
+                    })
+                }
+            })
+        })            
+    } else {
+        res.json(readResponse)
+    }
 })
 
+// Local Strategy
 router.post('/login', (req, res) => {
-    readResponseFile( async response => {
-        const user = await User.findOne({username: req.body.username}).exec()
-
-        req.logIn(user, err => {
-            if(err) {
-                response.message = `${process.env.MSG_SERVER_ERROR} ${err}`
-                response.code = 0
-                response.error = err
-                res.status(200).json(response)
-            } else {
-                passport.authenticate("local")(req, res, async () => {
-                    User.updateOne({_id: objectId(user._id)}, {token: req.sessionID}, (err, u) => {
-                        response.message = process.env.MSG_USER_LOGGED
-                        response.code = 1
-                        response.data = req.sessionID   
-                        res.status(200).json(response)
-                    })
+    readResponseFile( response => {
+        passport.authenticate("local")(req, res, (...args) => {
+            User.findOne({username: req.body.username}, (err, user) => {
+                User.updateOne({_id: objectId(user._id)}, {token: req.sessionID}, (err, u) => {
+                    response.message = process.env.MSG_USER_LOGGED
+                    response.code = 1
+                    response.data = req.sessionID   
+                    res.status(200).json(response)
                 })
-            }
+            })
         })
     })
+})  
+
+router.get('/clear', (req, res) => {
+    readResponse.code = 0
+    readResponse.data = null
+    readResponse.message = ''
+    res.status(200).json(readResponse)
 })
 
 router.get('/user/:token', (req, res) => {
     readResponseFile( response => {
         const token = req.params.token
-        User.findOne({token: token}, (err, user) => {
+        User.findOne({token: token}, (err, user) => {            
             getPhoto(user, u => {
                 response.code = 1
                 response.message = 'Returning User Authenticated'
@@ -126,12 +129,14 @@ router.get('/redirect', (req, res) => {
     }
 })
 
-router.get('/redirect/:token', (req, res) => {
-    if(req.params.token) {
-        const token = req.params.token
+// redirect for local strategy
+router.get('/redirect/local/:token', (req, res) => {
+    const token = req.params.token
+    if(token !== '' && token !== undefined) {
         res.render("redirect", { token: token, uri: '/dashboard' })
     }else {
-        res.send('You need to authenticate')
+        log('You need to authenticate')
+        res.send('You need to authenticate please!!')
     }
 })
 

@@ -34,6 +34,12 @@ const readResponseFile = async cb => {
   cb(response);
 };
 
+const readResponse = {
+  message: '',
+  code: 0,
+  data: null
+}
+
 /**
  * 
  * @param {*} id
@@ -61,4 +67,5 @@ module.exports = {
   readResponseFile: readResponseFile,
   findItem: findItem,
   objectId: objectId,
+  readResponse: readResponse
 };
