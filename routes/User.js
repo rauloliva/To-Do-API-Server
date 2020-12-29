@@ -4,7 +4,6 @@ const User = require('../models').user
 const fs = require('fs')
 const multer = require('multer')
 const { generateHash } = require('./Utilities')
-const { passwordChanged } = require('./Utilities')
 var storage = multer.diskStorage({
     destination: 'photos/',
     filename: (req, file, cb) => {
@@ -29,14 +28,12 @@ router.post('/photo/:token', upload.single('file'), (req, res) => {
     })
 })
 
-router.post('/update/:token', (req, res) => {
+router.patch('/update/:token', (req, res) => {
     const token = req.params.token
     const updatedData = {
         username: req.body.username,
         email: req.body.email
     }
-
-    console.log(updatedData);
 
     common.readResponseFile( response => {
         User.updateOne({token: token}, updatedData, (...args) => {
@@ -47,7 +44,7 @@ router.post('/update/:token', (req, res) => {
     })
 })
 
-router.post('/update/password/:token',(req, res) => {
+router.patch('/update/password/:token',(req, res) => {
     const token = req.params.token
     generateHash(req.body.password, (hash) => {
         common.readResponseFile( response => {

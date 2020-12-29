@@ -12,9 +12,7 @@ const env = process.env;
 const Strategies = () => {
   passport.use(
     new LocalStrategy(
-      {
-        usernameField: 'username'
-      },
+      { usernameField: 'username' },
       (username, password, done) => {
         User.findOne({username: username}, (err, user) => {
           if(user) {
@@ -22,9 +20,11 @@ const Strategies = () => {
                 if(same) {
                   return done(null, user)
                 } else {
-                  return done(null, false, {message: 'Wrong password buddy'})
+                  return done(null, false)
                 }
             })
+          } else {
+            return done(null, false)
           }
         })
       }

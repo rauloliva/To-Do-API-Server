@@ -7,7 +7,6 @@ const getPhoto = (user, cb) => {
         cb(user)
         return
     }
-    console.log('USER.photo', user.photo);
 
     if(user.photo !== undefined) {
         var photo = user.photo.filename
@@ -15,8 +14,6 @@ const getPhoto = (user, cb) => {
             fs.readFile('photos/'+photo, (err, data) => {
                 user.photo.original = photo
                 user.photo.filename = `data:${user.photo.mimetype};base64,${data.toString('base64')}`
-                
-                // console.log(user.photo);
                 cb(user)
             })
         } else{
@@ -36,14 +33,5 @@ const generateHash = (data, cb) => {
 }
 
 const validatePassword = (password, hash, cb) => bcrypt.compare(password, hash, cb)
-
-const passwordChanged = (pwd, token, cb) => {
-    User.findOne({token: token}, (err, user) => {
-        const password = user.password
-        console.log('User', user);
-        console.log('PWD', pwd);
-        bcrypt.compare(pwd, password, cb)
-    })
-}
 
 module.exports = { getPhoto, generateHash, validatePassword, passwordChanged }
