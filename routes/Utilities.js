@@ -34,4 +34,4 @@ const generateHash = (data, cb) => {
 
 const validatePassword = (password, hash, cb) => bcrypt.compare(password, hash, cb)
 
-module.exports = { getPhoto, generateHash, validatePassword, passwordChanged }
+module.exports = { getPhoto, generateHash, validatePassword }
