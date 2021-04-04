@@ -5,9 +5,10 @@ const List = require('../models').list
 const common = require('./common/Common')
 const router = express.Router()
 
-router.post('/create', (req, res) => {
+router.post('/create/:token', (req, res) => {
+    const token = req.params.token
     common.readResponseFile( response => {
-        common.isAuthenticated(req, res, response, () => {
+        common.isAuthenticated(token, res, response, () => {
             const item = new Item({
                 task: req.body.task,
                 isDone: req.body.isDone
@@ -20,7 +21,7 @@ router.post('/create', (req, res) => {
                     res.status(500).json(response)
                 } else {
                     const listId = mongoose.Types.ObjectId(req.body.listId)
-                    updateItemsOnList(listId, newItem._id, () => {
+                    updateItemsOnList(listId, newItem, () => {
                         response.message = process.env.MSG_ITEM_RETRIEVED.replace('#', req.body.task)
                         response.data = newItem
                         response.code = 1
@@ -79,10 +80,10 @@ router.delete('/:itemId', (req, res) => {
     })
 })
 
-const updateItemsOnList = (listId, itemId, sendResponse) => {
+const updateItemsOnList = (listId, itemObject, sendResponse) => {
     List.findOne({_id: listId}, async (err, list) => {
         const currentItems = list.items
-        const newItems = [...currentItems, itemId]
+        const newItems = [...currentItems, itemObject]
         list.items = newItems
         await list.save()
         sendResponse()

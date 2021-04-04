@@ -1,25 +1,27 @@
 const fs = require('fs');
 const mongoose = require('mongoose');
 const Item = require('../../models').item;
+const User = require('../../models').user;
 
 /**
  * Verifies if the user is authenticated, if so
  * the cb will be executed
  * 
- * @param {Request} req the request object
+ * @param {String} token the user's token
  * @param {Response} res the response object
  * @param {JSON} response the JSON file
  * @param {Function} cb the callback function
  */
-const isAuthenticated = (req, res, response, cb) => {
-  if (req.isAuthenticated()) {
-    cb();
-  } else {
-    response.message = process.env.MSG_ERROR_AUTH;
-    response.code = 2;
-    res.status(401).json(response);
-  }
-};
+const isAuthenticated = (token, res, response, cb) => {
+  User.findOne({token: token}, (err, user) => {
+    if(user) {
+      cb(user)
+    } else {
+      response.code = 2;
+      res.status(401).json(response);
+    }
+  })
+}
 
 /**
  * Reads the response.json file

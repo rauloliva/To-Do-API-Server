@@ -23,13 +23,14 @@ router.get('/', (req, res) => {
     })
 })
 
-router.post('/create', (req, res) => {
+router.post('/create/:token', (req, res) => {
+    const token = req.params.token
     common.readResponseFile( response => {
-        common.isAuthenticated(req, res, response, () => {
+        common.isAuthenticated(token, res, response, user => {
             const list = new List({
                 name: req.body.name,
                 description: req.body.description,
-                user: req.user.id,
+                user: user.id,
                 items: []
             })
 
@@ -39,7 +40,6 @@ router.post('/create', (req, res) => {
                     response.code = 2
                     res.status(500).json(response)
                 } else {
-                    response.message = `The list '${req.body.name}' has been created`
                     response.data = newList
                     response.code = 1
                     res.status(201).json(response)
@@ -62,7 +62,6 @@ router.put('/:listId', (req, res) => {
                     list.description = req.body.description
                     
                     await list.save()
-                    response.message = `The list ${req.body.name} has been updated`
                     response.code = 1
                     response.data = list
                 }

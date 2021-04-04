@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema(
     githubId: String,
     twitterId: String,
     twitchId: String,
+    createdDate: String,
+    lastLogged: String,
   },
   { timestamps: true }
 );
@@ -30,13 +32,8 @@ const listSchema = new mongoose.Schema(
   {
     name: String,
     description: String,
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'user',
-    },
-    items: {
-      type: mongoose.Schema.Types.Array,
-    },
+    user: mongoose.Schema.Types.ObjectId,
+    items: Array,
   },
   { timestamps: true }
 );

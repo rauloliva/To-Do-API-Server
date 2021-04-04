@@ -1,6 +1,9 @@
 const express = require('express')
 const common = require('./common/Common')
 const User = require('../models').user
+const List = require('../models').list
+const Item = require('../models').item
+const mongoose = require('mongoose')
 const fs = require('fs')
 const multer = require('multer')
 const { generateHash } = require('./Utilities')
@@ -53,6 +56,19 @@ router.patch('/update/password/:token',(req, res) => {
                 response.message = 'Password updated succesfully'
                 res.status(200).json(response)
             })
+        })
+    })
+})
+
+router.get('/lists/:token', (req, res) => {
+    const token = req.params.token
+    
+
+    User.findOne({token: token}, (err, user) => {
+        const userId = mongoose.Types.ObjectId(user._id)
+        List.find({user: {$in: [userId]}}, (err, lists) => {
+            console.log(lists);
+            res.status(200).json({data: lists})
         })
     })
 })

@@ -49,9 +49,10 @@ const Strategies = () => {
           token: accessToken,
           authLocally: false
         };
-        User.findOrCreate(user, (err, user) => {
-          return cb(err, user);
-        });
+
+        findOrCreate({facebookId: user.facebookId}, user, (err, userReturned) => {
+          return cb(err, userReturned)
+        })
       }
     )
   );
@@ -72,9 +73,10 @@ const Strategies = () => {
           token: accessToken,
           authLocally: false
         };
-        User.findOrCreate(user, (err, user) => {
-          return cb(err, user);
-        });
+
+        findOrCreate({githubId: user.githubId}, user, (err, userReturned) => {
+          return cb(err, userReturned)
+        })
       }
     )
   );
@@ -97,9 +99,10 @@ const Strategies = () => {
           token: accessToken,
           authLocally: false
         };
-        User.findOrCreate(user, (err, user) => {
-          return cb(err, user);
-        });
+
+        findOrCreate({twitterId: user.twitterId}, user, (err, userReturned) => {
+          return cb(err, userReturned)
+        })
       }
     )
   );
@@ -120,9 +123,10 @@ const Strategies = () => {
           token: accessToken,
           authLocally: false
         };
-        User.findOrCreate(user, (err, user) => {
-          return cb(err, user);
-        });
+
+        findOrCreate({googleId: user.googleId}, user, (err, userReturned) => {
+          return cb(err, userReturned)
+        })
       }
     )
   );
@@ -150,5 +154,17 @@ const Strategies = () => {
     )
   );
 };
+
+const findOrCreate = (condition, user, cb) => {
+  User.findOneAndUpdate(condition, user, (err, userUpdated) => {
+    if(userUpdated) {
+      return cb(err, userUpdated);
+    } else {
+      User.create(user).then( newUser => {
+        return cb(err, newUser);
+      })
+    }
+  })
+}
 
 module.exports = Strategies;

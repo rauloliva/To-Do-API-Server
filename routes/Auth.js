@@ -22,12 +22,10 @@ router.post('/register', (req, res) => {
 
             User.findOne({username: req.body.username}, (err, userFound) => {
                 if(userFound) {
-                    readResponse.message = "The username already exists"
                     readResponse.code = -1 
                     res.json(readResponse)
                 } else {
                     user.save((err, d) => {
-                        readResponse.message = "User Created"
                         readResponse.code = 1
                         readResponse.data = user.token
                         res.json(readResponse)
@@ -46,7 +44,6 @@ router.post('/login', (req, res) => {
         passport.authenticate("local")(req, res, (...args) => {
             User.findOne({username: req.body.username}, (err, user) => {
                 User.updateOne({_id: objectId(user._id)}, {token: req.sessionID}, (err, u) => {
-                    response.message = process.env.MSG_USER_LOGGED
                     response.code = 1
                     response.data = req.sessionID   
                     res.status(200).json(response)
@@ -60,7 +57,7 @@ router.get('/clear', (req, res) => {
     readResponse.code = 0
     readResponse.data = null
     readResponse.message = ''
-    res.status(200).json(readResponse)
+    res.status(200).json({message: 'Server: respone object is clean'})
 })
 
 router.get('/user/:token', (req, res) => {
@@ -69,7 +66,6 @@ router.get('/user/:token', (req, res) => {
         User.findOne({token: token}, (err, user) => {            
             getPhoto(user, u => {
                 response.code = 1
-                response.message = 'Returning User Authenticated'
                 response.data = u
                 res.status(200).json(response)
             })
